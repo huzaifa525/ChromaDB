@@ -1,24 +1,30 @@
-# Base image
+# -------------------------------
+# 🚀 Base Image
+# -------------------------------
 FROM python:3.11-slim
 
-# System dependencies
+# -------------------------------
+# 🛠 Install Dependencies
+# -------------------------------
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
-# Working directory
+# -------------------------------
+# 📁 Working Directory
+# -------------------------------
 WORKDIR /app
 
-# Install ChromaDB + optional dependencies
+# -------------------------------
+# 🧠 Install ChromaDB + Embeddings
+# -------------------------------
 ENV PIP_NO_CACHE_DIR=1
 RUN pip install chromadb[server]==0.4.24 sentence-transformers
 
-# Make a directory for persistent DB storage
-RUN mkdir -p /app/chroma-data
-VOLUME /app/chroma-data
-
-# Set environment variables for auth + telemetry
+# -------------------------------
+# 🔐 Server Auth Config (Inline)
+# -------------------------------
 ENV CHROMA_TELEMETRY_ENABLED=false
 ENV CHROMA_SERVER_AUTHN_CREDENTIALS='{
   "auth_method": "token",
@@ -31,8 +37,13 @@ ENV CHROMA_SERVER_AUTHN_CREDENTIALS='{
   }
 }'
 
-# Expose default Chroma port
+# -------------------------------
+# 🌍 Expose API Port
+# -------------------------------
 EXPOSE 8000
 
-# Start ChromaDB server with persistent storage + multi-tenant auth
+# -------------------------------
+# 🧠 ChromaDB Startup Command
+# -------------------------------
+# NOTE: /app/chroma-data is your Railway volume mount path
 CMD ["chromadb", "run", "--path", "/app/chroma-data", "--host", "0.0.0.0", "--port", "8000"]
