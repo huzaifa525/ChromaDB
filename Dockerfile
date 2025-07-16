@@ -13,9 +13,10 @@ RUN pip install chromadb[server]==0.4.24 sentence-transformers
 # Disable telemetry
 ENV CHROMA_TELEMETRY_ENABLED=false
 
-# ✅ Escaped JSON string to avoid Docker parse errors
+# Inline auth config as escaped JSON
 ENV CHROMA_SERVER_AUTHN_CREDENTIALS="{\"auth_method\":\"token\",\"tenants\":{\"default_tenant\":{\"username\":\"admin\",\"password\":\"supersecure123\",\"api_key\":\"z4mtyftnvtnn3jbo7lrt891cpcnwk7q2\"}}}"
 
 EXPOSE 8000
 
-CMD ["chromadb", "run", "--path", "/app/chroma-data", "--host", "0.0.0.0", "--port", "8000"]
+# ✅ Use Python module directly to run Chroma server
+CMD ["python", "-m", "chromadb.cli", "run", "--path", "/app/chroma-data", "--host", "0.0.0.0", "--port", "8000"]
